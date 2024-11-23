@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 class Program
 {
-	const string PROCESS_LOCATION = "D:\\Example\\Process\\Console3D.exe";
+	const string PROCESS_LOCATION = "D:\\Example\\Process\\client1.exe";
 	const string BOARD_LOCATION = "D:\\Example\\board.txt";
 	const int PROCESS_COUNT = 4;
 	const int MILLISECONDS_TIME = 30000; //180000
@@ -48,7 +48,7 @@ class Program
 
 		Thread.Sleep(MILLISECONDS_TIME);
 
-		byte[] buffer = System.Text.Encoding.ASCII.GetBytes("VoteEnded");
+		byte[] buffer = System.Text.Encoding.ASCII.GetBytes("GenerationEnded");
 		for (int i = 0; i < PROCESS_COUNT; i++)
 		{
 			clients[i].GetStream().Write(buffer, 0, buffer.Length);
