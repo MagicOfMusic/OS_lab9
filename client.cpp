@@ -64,7 +64,7 @@ void HandleServerConnection(SOCKET clientSocket)
 
             std::cout << "Idea: " << ideas[ideaIndex] << std::endl;
         }
-        else if (message == "VoteEnded")
+        else if (message == "GenerationEnded")
         {
             int vote1, vote2, vote3;
             while (true) {
