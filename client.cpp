@@ -12,7 +12,7 @@
 
 #define MAX_IDEAS 50
 
-std::string boardLocation; 
+std::string boardLocation;
 int processIndex;
 
 std::string ideas[MAX_IDEAS] = {
@@ -30,33 +30,34 @@ std::string ideas[MAX_IDEAS] = {
     "AI in Education", "AI in Medicine", "AI in Finance", "AI Ethics"
 };
 
-void HandleServerConnection(SOCKET clientSocket) 
+void HandleServerConnection(SOCKET clientSocket)
 {
     char buffer[1024];
     int bytesReceived;
 
     while (true)
     {
+        srand(static_cast<unsigned>(time(0)) + GetCurrentProcessId());
+        int ideaIndex = rand() % MAX_IDEAS;
+
         const std::string requestMessage = "RequestFile";
         send(clientSocket, requestMessage.c_str(), requestMessage.length(), 0);
 
         bytesReceived = recv(clientSocket, buffer, sizeof(buffer), 0);
-        if (bytesReceived <= 0) {
+        if (bytesReceived <= 0)
+        {
             break;
         }
 
         buffer[bytesReceived] = '\0';
         std::string message(buffer);
 
-        if (message == "PermissionGranted") 
+        if (message == "PermissionGranted")
         {
             std::this_thread::sleep_for(std::chrono::seconds(1));
 
-            srand(static_cast<unsigned>(time(0)) + GetCurrentProcessId());
-            int ideaIndex = rand() % MAX_IDEAS;
-
             std::ofstream outFile(boardLocation, std::ios::app);
-            outFile << "Process " << processIndex+1 << " idea: " << ideas[ideaIndex] << std::endl;
+            outFile << "Process " << processIndex + 1 << " idea: " << ideas[ideaIndex] << std::endl;
             outFile.close();
 
             const std::string completedMessage = "FileProcessed";
@@ -64,7 +65,7 @@ void HandleServerConnection(SOCKET clientSocket)
 
             std::cout << "Idea: " << ideas[ideaIndex] << std::endl;
         }
-        else if (message == "VoteEnded")
+        else if (message == "GenerationEnded")
         {
             int vote1, vote2, vote3;
             while (true) {
@@ -88,7 +89,7 @@ void HandleServerConnection(SOCKET clientSocket)
     closesocket(clientSocket);
 }
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
     if (argc != 3) {
         std::cerr << "Incorrect arguments" << std::endl;
@@ -96,7 +97,7 @@ int main(int argc, char* argv[])
     }
 
     boardLocation = argv[1];
-    processIndex = std::stoi(argv[2]); 
+    processIndex = std::stoi(argv[2]);
 
     WSADATA wsaData;
     SOCKET clientSocket;
