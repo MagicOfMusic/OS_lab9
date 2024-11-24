@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <future>
 #include <thread>
 #include <chrono>
 #include <ctime>
@@ -11,9 +12,12 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #define MAX_IDEAS 50
+#define PROCESS_COUNT 4
 
 std::string boardLocation;
 int processIndex;
+std::promise<void> printIdeasPromise;
+std::future<void> printIdeasFuture = printIdeasPromise.get_future();
 
 std::string ideas[MAX_IDEAS] = {
     "AI", "Blockchain", "Quantum Computing", "Cloud", "Big Data", "IoT",
@@ -44,16 +48,39 @@ void SendIdea(SOCKET clientSocket, std::string idea)
     std::cout << "Idea: " << idea << std::endl;
 }
 
+void PrintIdeas()
+{
+    std::ifstream input(boardLocation);
+
+    if (!input)
+        std::cerr << "Error opening file for reading!" << std::endl;
+
+    std::cout << "\nFinal board with ideas:" << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    std::string line;
+    int counter = 1;
+
+    while (std::getline(input, line))
+    {
+        std::cout << counter << ". " << line << std::endl;
+        counter++;
+    }
+
+    input.close();
+}
+
 void Vote(SOCKET clientSocket, int ideasNum)
 {
+    PrintIdeas();
     int vote1, vote2, vote3;
     while (true) {
         std::cout << "Enter three best ideas: ";
         std::cin >> vote1 >> vote2 >> vote3;
 
-        if (vote1 >= 1 && vote1 <= ideasNum && vote2 >= 1 && vote2 <= ideasNum && vote3 >= 1 && vote3 <= ideasNum) 
+        if (vote1 >= 1 && vote1 <= ideasNum && vote2 >= 1 && vote2 <= ideasNum && vote3 >= 1 && vote3 <= ideasNum)
             break;
-        else 
+        else
             std::cout << "Error. Choose 1 - " << ideasNum << std::endl;
     }
 
@@ -90,7 +117,7 @@ void HandleServerConnection(SOCKET clientSocket)
         }
         else if (message == "GenerationEnded")
         {
-            Vote(clientSocket, 50); 
+            Vote(clientSocket, 50);
             break;
         }
     }
