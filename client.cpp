@@ -44,6 +44,28 @@ void SendIdea(SOCKET clientSocket, std::string idea)
     std::cout << "Idea: " << idea << std::endl;
 }
 
+void PrintIdeas()
+{
+    std::ifstream input(boardLocation);
+
+    if (!input)
+        std::cerr << "Error opening file for reading!" << std::endl;
+
+    std::cout << "\nFinal board with ideas:" << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+
+    std::string line;
+    int counter = 1;
+
+    while (std::getline(input, line))
+    {
+        std::cout << counter << ". " << line << std::endl;
+        counter++;
+    }
+
+    input.close();
+}
+
 void Vote(SOCKET clientSocket, int ideasNum)
 {
     int vote1, vote2, vote3;
@@ -51,9 +73,9 @@ void Vote(SOCKET clientSocket, int ideasNum)
         std::cout << "Enter three best ideas: ";
         std::cin >> vote1 >> vote2 >> vote3;
 
-        if (vote1 >= 1 && vote1 <= ideasNum && vote2 >= 1 && vote2 <= ideasNum && vote3 >= 1 && vote3 <= ideasNum) 
+        if (vote1 >= 1 && vote1 <= ideasNum && vote2 >= 1 && vote2 <= ideasNum && vote3 >= 1 && vote3 <= ideasNum)
             break;
-        else 
+        else
             std::cout << "Error. Choose 1 - " << ideasNum << std::endl;
     }
 
@@ -90,7 +112,8 @@ void HandleServerConnection(SOCKET clientSocket)
         }
         else if (message == "GenerationEnded")
         {
-            Vote(clientSocket, 50); 
+            PrintIdeas();
+            Vote(clientSocket, 50);
             break;
         }
     }
