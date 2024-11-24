@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <future>
 #include <thread>
 #include <chrono>
 #include <ctime>
@@ -12,12 +11,9 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #define MAX_IDEAS 50
-#define PROCESS_COUNT 4
 
 std::string boardLocation;
 int processIndex;
-std::promise<void> printIdeasPromise;
-std::future<void> printIdeasFuture = printIdeasPromise.get_future();
 
 std::string ideas[MAX_IDEAS] = {
     "AI", "Blockchain", "Quantum Computing", "Cloud", "Big Data", "IoT",
@@ -72,7 +68,6 @@ void PrintIdeas()
 
 void Vote(SOCKET clientSocket, int ideasNum)
 {
-    PrintIdeas();
     int vote1, vote2, vote3;
     while (true) {
         std::cout << "Enter three best ideas: ";
@@ -117,6 +112,7 @@ void HandleServerConnection(SOCKET clientSocket)
         }
         else if (message == "GenerationEnded")
         {
+            PrintIdeas();
             Vote(clientSocket, 50);
             break;
         }
